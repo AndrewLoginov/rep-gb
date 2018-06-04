@@ -1,39 +1,56 @@
-var t1 = +process.argv[2];   
-var t2 = +process.argv[3];    
+function wrongArgs(vt1, vt2)
+{   
 
-if (Math.min(t1,t2)>=1 & Math.max(t1,t2)<=100000){
-    var ss=t1+t2;
-    var s = ss%60;                    //секунды
-    var m = Math.trunc(ss/60)%60      //минуты
-    var h = Math.trunc(ss/3600)%24    //часы
-    var d = Math.trunc(ss/(3600*24))  //дни
-    var out = "";
-    if (d==1) out = "1 день";
-    if (d==2) out = "2 дня";
-    if (h>0){
-        out = out +" "+getext(h,"час");
+    if ((isNaN(vt1)) || (isNaN(vt2)))
+        return 'Неправильно указан временной промежуток';
+    else
+    {
+        vt1 = parseInt(vt1);
+        vt2 = parseInt(vt2);
+        if ((vt1 < 1) || (vt1 > 100000) || (vt2 < 1) || (vt2 > 100000))
+            return 'Неправильно указан временной промежуток';
     }
-    if (m>0){
-        out = out +" "+getext(m,"минут");
-    }
-    if (s>0){
-        out = out +" "+getext(s,"секунд");
-    }
-    console.log(out);
-} else {
-    if (t1<1 | t1>100000) console.log("1 <= t1 <= 100000 - не соблюдается");
-    if (t2<1 | t2>100000) console.log("1 <= t2 <= 100000 - не соблюдается");
-}   
-function getext( m,  h){
-    res = "";
-    if (m==1 | m==21 | m==31 | m==41 |m==51) {
-        res = m.toString()+" "+h+((h=="час")? "":"a")  
-    } 
-    if ((m>=2 & m<=4) | (m>=22 & m<=24) | (m>=32 & m<=34)  | (m>=42 & m<=44)  | (m>=52 & m<=54)){
-        res = m.toString()+" "+h+((h=="час")? "а":"ы")
-    } 
-    if ((m>=5 & m<=21) | (m>=25 & m<=30) | (m>=35 & m<=40)  | (m>=45 & m<=50)  | (m>=55 & m<=59)) {
-        res = m.toString()+" "+h+((h=="час")? "ов":"");
-    }
-    return res;
+    return 0;
+}
+function wordend(num, words)
+{
+    num = num%100;
+    if (num > 20)
+        num %= 10;
+    return words[ (num > 4 || num === 0) + (num !== 1) ];
+}
+var t1 = process.argv[2];
+var t2 = process.argv[3];
+var checkArguments = wrongArgs(t1, t2);
+if (checkArguments !== 0)
+{
+    process.stdout.write(checkArguments);
+}
+else
+{
+    t1 = parseInt(t1);
+    t2 = parseInt(t2);
+    const t = t1 + t2;
+    const h = Math.floor(t/3600);
+    const m = Math.floor((t - 3600*h)/60);
+    const s = t - 3600*h - 60*m;
+    if ((m === 0) && (s === 0))
+        process.stdout.write(String(h + ' ' + wordend(h, ['час', 'часа', 'часов'])));
+    else
+        if ((h !== 0) && (s === 0))
+            process.stdout.write(String(h + ' ' + wordend(h, ['час', 'часа', 'часов']) + ' ' + m + ' ' + wordend(m, ['минута', 'минуты', 'минут'])));
+        else
+            if (s === 0)
+                process.stdout.write(String(m + ' ' + wordend(m, ['минута', 'минуты', 'минут'])));
+            else
+                if ((h !== 0) && (m !== 0))
+                    process.stdout.write(String(h + ' ' + wordend(h, ['час', 'часа', 'часов']) + ' ' + m + ' ' + wordend(m, ['минута', 'минуты', 'минут']) + ' ' + s + ' ' + wordend(s, ['секунда', 'секунды', 'секунд'])));
+                else
+                    if (h !== 0)
+                        process.stdout.write(String(h + ' ' + wordend(h, ['час', 'часа', 'часов']) + ' ' + s + ' ' + wordend(s, ['секунда', 'секунды', 'секунд'])));
+                    else
+                        if (m !== 0)
+                            process.stdout.write(String(m + ' ' + wordend(m, ['минута', 'минуты', 'минут']) + ' ' + s + ' ' + wordend(s, ['секунда', 'секунды', 'секунд'])));
+                        else
+                            process.stdout.write(String(s + ' ' + wordend(s, ['секунда', 'секунды', 'секунд'])));
 }
