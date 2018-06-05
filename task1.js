@@ -1,17 +1,17 @@
-function onlyDigits(vf)
-{
 
-    if (vf < 11)
+function onlyDigits(numberSystem)
+{
+    if (numberSystem < 11)
         return 1;
     else
         return 0;
 }
-function maxSymbol(vff)
+function maxSymbol(vF)
 {
-    if (vff < 11)
-        return 47 + vff;
+    if (vF < 11)
+        return 47 + vF;
     else
-        return 54 + vff;
+        return 86 + vF;
 }
 function wrongArgs(iV, fV, bV)
 {
@@ -30,98 +30,86 @@ function wrongArgs(iV, fV, bV)
     if ((fV < 2) || (fV > 36) || (bV < 2) || (bV > 36))
         return 'Недопустимое основание системы счисления';
     const max = maxSymbol(fV);
-    let symbol;
+    let nextSymbol;
     if (onlyDigits(fV) === 1)
-    {       
+    {
         for (let count = 0; count < iV.length; count++)
         {
-            symbol = iV.charCodeAt(count);          
-            if ((symbol < 48) || (symbol > max))
+            nextSymbol = iV.charCodeAt(count);          
+            if ((nextSymbol < 48) || (nextSymbol > max))
                 return 'Недопустимый символ в числе';
         }
     }
     else
     {
-        for (lrt count = 0; count < iV.length; count++)
+        iV = iV.toLowerCase();
+        for (let count = 0; count < iV.length; count++)
         {
-            symbol = iV.charCodeAt(count);
-            if ((symbol < 48) || ((symbol > 57) && (symbol < 65)) || ((symbol > max) && (symbol < 97)) || (symbol > (max + 32)))
+            nextSymbol = iV.charCodeAt(count);
+            if ((nextSymbol < 48) || ((nextSymbol > 57) && (nextSymbol < 97)) || (nextSymbol > (max + 32)))
                 return 'Недопустимый символ в числе';
         }
     }
     return 0;
 }
-function parseToSystem10(ival)
+function parseToSystem10(iVal)
 {
-    if (isNaN(ival))
+    if (isNaN(iVal))
     {
-        var symbolCode = ival.charCodeAt(0);
-        if (symbolCode > 96)
-            return symbolCode - 87;
-        else
-            return symbolCode - 55;
+        const symbolCode = iVal.toLowerCase().charCodeAt(0);
+        return symbolCode - 87;
     }
     return parseInt(iVal);
 }
-var i = process.argv[2];
-var f = process.argv[3];
-var b = process.argv[4];
-var checkArguments = wrongArgs(i, f, b);
-if (checkArguments !== 0)
+function convertNumber(numberForConvert, fromSystem, toSystem)
 {
-    process.stdout.write(checkArguments);
-}
-else
-{
-    f = parseInt(f);
-    b = parseInt(b);
-    if (f === b)
-    {
-        process.stdout.write(i);
-    }
-    else
-    {
-        let system10 = 0;
-        let systemB = '';
-        let fullNumber;
-        let output = '';
-        const symbols = '0123456789abcdefghijklmnopqrstuvwxyz';
-        if (f < 10)
+        fromSystem = parseInt(fromSystem);
+        toSystem = parseInt(toSystem);
+        if (fromSystem === toSystem)
         {
-            for (let count = 0; count < i.length; count++)
-            {
-                system10 += parseInt(i[count])*(Math.pow(f,(i.length - count - 1)));
-            }
+            process.stdout.write(numberForConvert);
         }
         else
-            if (f !== 10)
+        {
+            let numberInSystem10 = 0;
+            let numberInNewSystem = '';
+            let integerPartOfNumber;
+            const symbolsArray = '0123456789abcdefghijklmnopqrstuvwxyz';
+            if (fromSystem < 10)
             {
-                for (let count = 0; count < i.length; count++)
+                for (let count = 0; count < numberForConvert.length; count++)
                 {
-                    system10 += parseToSystem10(i[count])*(Math.pow(f,(i.length - count - 1)));
+                    numberInSystem10 += parseInt(numberForConvert[count])*(Math.pow(fromSystem,(numberForConvert.length - count - 1)));
                 }
             }
             else
-            {
-                system10 = parseInt(i);
-            }   
+                if (fromSystem !== 10)
+                {
+                    for (let count = 0; count < numberForConvert.length; count++)
+                    {
+                        numberInSystem10 += parseToSystem10(numberForConvert[count])*(Math.pow(fromSystem,(numberForConvert.length - count - 1)));
+                    }
+                }
+                else
+                {
+                    numberInSystem10 = parseInt(numberForConvert);
+                }   
 
-        if (b !== 10)
-        {
-            do
+            if (toSystem !== 10)
             {
-                fullNumber = symbols[system10 % b];
-                systemB += fullNumber;
-                system10 = Math.floor(system10 / b);            
+                do
+                {
+                    integerPartOfNumber = symbolsArray[numberInSystem10 % toSystem];
+
+                    numberInNewSystem = integerPartOfNumber + numberInNewSystem;
+                    numberInSystem10 = Math.floor(numberInSystem10 / toSystem);         
+                }
+                while (numberInSystem10 !== 0);
             }
-            while (system10 !== 0);
-            for (let count = systemB.length - 1; count >= 0; count--)
-            {
-                output += systemB[count];
-            }
+            else
+                numberInNewSystem = numberInSystem10;
+            process.stdout.write(String(numberInNewSystem));
         }
-        else
-            output = system10;
-        process.stdout.write(String(output));
-    }
 }
+var dataForTask1 = [process.argv[2], process.argv[3], process.argv[4]];
+convertNumber(...dataForTask1);
